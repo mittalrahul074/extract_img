@@ -1,0 +1,128 @@
+
+<!doctype html><html><head><meta charset="UTF-8"/><link rel="dns-prefetch" href="static.meeshosupply.com"/><link rel="dns-prefetch" href="images.meeshosupplyassets.com"/><link rel="dns-prefetch" href="panelchunks.meeshosupplyassets.com"/><link rel="preconnect" href="static.meeshosupply.com" crossorigin/><link rel="preconnect" href="images.meeshosupplyassets.com" crossorigin/><link rel="preconnect" href="panelchunks.meeshosupplyassets.com" crossorigin/><link rel="preload" href="https://static.meeshosupply.com/fonts/Mier_B02-Book.woff2" as="font" type="font/woff2" crossorigin/><link rel="preload" href="https://static.meeshosupply.com/fonts/Mier_B02-Bold.woff2" as="font" type="font/woff2" crossorigin/><style>/* Critical CSS for FCP optimization */
+        body {
+            margin: 0;
+            font-family: 'Mier Book', -apple-system, BlinkMacSystemFont,
+                'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+                sans-serif;
+            background-color: #f2f5fa;
+        }
+
+        .loading-container-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f2f5fa;
+            width: 100%;
+        }
+
+        .loading-container {
+            position: relative;
+            width: 36px;
+            height: 36px;
+        }
+
+        .loading-spinner {
+            width: 36px;
+            height: 36px;
+            transform: rotate(-90deg);
+            color: #edeaff;
+        }
+
+        .loading-progress {
+            color: #3c29b7;
+            position: absolute;
+            left: 0;
+            width: 36px;
+            height: 36px;
+            animation: rotate 1s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }</style><script>(function () {
+            var BASE_FONT_URL = 'https://static.meeshosupply.com/fonts/';
+            var FONT_FACES = [
+                {
+                    name: 'Mier Bold',
+                    woff2: 'Mier_B02-Bold.woff2',
+                    woff: 'Mier_B02-Bold.woff',
+                },
+                {
+                    name: 'Mier Book',
+                    woff2: 'Mier_B02-Book.woff2',
+                    woff: 'Mier_B02-Book.woff',
+                },
+                {
+                    name: 'Mier Demi',
+                    woff2: 'Mier_B02-Demi.woff2',
+                    woff: 'Mier_B02-Demi.woff',
+                },
+            ];
+
+            // Use FontFace API if available for better performance
+            if (window.FontFace) {
+                // Load fonts asynchronously without blocking
+                FONT_FACES.forEach(function (item) {
+                    var source =
+                        'url("' +
+                        BASE_FONT_URL +
+                        item.woff2 +
+                        '") format("woff2"), url("' +
+                        BASE_FONT_URL +
+                        item.woff +
+                        '") format("woff")';
+                    var fontFace = new FontFace(item.name, source, {
+                        display: 'swap',
+                        weight: item.name.includes('Bold')
+                            ? '700'
+                            : item.name.includes('Demi')
+                                ? '600'
+                                : '400',
+                    });
+
+                    fontFace
+                        .load()
+                        .then(function () {
+                            document.fonts.add(fontFace);
+                        })
+                        .catch(function (err) {
+                            console.warn('Font loading failed:', err);
+                            // Browser will automatically use fallback fonts
+                        });
+                });
+            } else {
+                // Fallback for older browsers
+                FONT_FACES.reduce(function (acc, fontface) {
+                    acc.push({
+                        url: fontface.woff2,
+                        type: 'woff2',
+                    });
+                    acc.push({
+                        url: fontface.woff,
+                        type: 'woff',
+                    });
+                    return acc;
+                }, []).forEach(function (item) {
+                    var linkElement = document.createElement('link');
+                    linkElement.rel = 'preload';
+                    linkElement.href = BASE_FONT_URL + item.url;
+                    linkElement.as = 'font';
+                    linkElement.type = 'font/' + item.type;
+                    linkElement.crossOrigin = 'anonymous';
+                    document.head.appendChild(linkElement);
+                });
+            }
+        })();</script><noscript><link rel="stylesheet" href="https://static.meeshosupply.com/css/mier-fonts-swap.css"/><div style="padding: 0 1.5rem"><h2>Meesho Supplier Panel</h2><span>Hello there! It seems like JavaScript is disabled in your browser.<br/>To fully experience our website's features and functionality, we recommend enabling JavaScript in your browser settings.</span></div></noscript><link rel="shortcut icon" href="https://static.meeshosupply.com/web/meesho-logo-fav.png"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Meesho | Supplier Panel</title><script defer="defer" src="https://panelchunks.meeshosupplyassets.com/container/main.7c128aa22ac0c06c03ca.js"></script></head><body><div id="root"><div class="loading-container-wrapper"><div class="loading-container"><span role="progressbar" aria-valuenow="100" class="loading-spinner"><svg viewBox="22 22 44 44"><circle cx="44" cy="44" r="20" fill="none" stroke-width="4" stroke="currentColor" style="stroke-dasharray: 125.664;
+                                    stroke-dashoffset: 0px;"></circle></svg> </span><span role="progressbar" class="loading-progress"><svg viewBox="22 22 44 44"><circle cx="44" cy="44" r="20" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="80px, 200px" stroke-dashoffset="0"></circle></svg></span></div></div></div><div id="plugin"></div><div id="alerts"></div><script type="text/javascript"  src="/CfxN0OI5YyOHx_I8HJU6/LiEikJ9cDifOffmatY/KnZ7Vkk/cSgfWCt/SVSQ"></script></body><script>
+                    window.ts=29365548;
+                    window.isDesktop = true;
+                </script><script defer src="https://panelchunks.meeshosupplyassets.com/fulfillment/remoteEntry.js?ts=29365548"></script><script>window.__SUPPLY_DATA__ = {"registrationStatus":{"decodedToken":{"user_id":"512aecfa-676c-4984-a2ed-d1c5bfc2a45d","name":"Mittal Distributor","email":"mittalanish8055@gmail.com","role":"user","valid":1,"supplier_identifier_to_id_mapping":{"yoxpf":113207},"supplier_identifiers":["yoxpf"],"registration_status":"SUPPLIER_CREATED"},"isAuthenticated":true},"supplier":{"supplier_id":113207,"name":"GorkhaStyle","identifier":"yoxpf","email":"mittalanish8055@gmail.com","phone":"8945808358","carrier_id":4,"default_monetization_percent":4,"default_monetization_type":1,"supplies_replica":0,"account_manager_id":16,"is_agreement_accepted":true,"prime_category":0,"logistic_fee_enabled":1,"login_enabled":true,"enable_inventory":true,"enable_no_packing_needed_tab":false,"ads_smart_campaign_banner_last_cancel_date":"2023,09,07","meesholink-parallel-order-processing-enabled":false,"whatsapp_opt_in":true,"enable_no_packing_needed_tan":false,"sscat_shipping_adjustment":true,"enable_influencer_marketing":false,"enable_price_recommendations_v3":true,"ads_has_seen_vg_popup_info":false,"enable_compliance_attribute_upload":false,"npp_vsku_pricing_enabled":true,"bank_details_exp_self_serve_enabled":true,"wdrp_max_guardrail_percentage":1,"enable_home_mweb_v3":true,"enable_meesho_promotions":false,"is_waas_banner_enabled":false,"enable_referral_v3":true,"show_ads_on_inventory_tooltip":true,"ads_sales_day_budget_consent":"show","enable_compliance_gating":false,"enable_lc_upcoming_tab":false,"enable_claim_approvals_promotional_banner":true,"enable_support_tampered_packaging":false,"loadshare_supplier_code":"default","enable_smart_sourcing_v2":true,"enable_picklist":false,"enable_support_claims_upstream_ds_validation":false,"is_live_commerce_enabled":false,"disable_incentive_v2":false,"enable_return_recon_claims":true,"last_interacted_tos_modal":"2024,07,11","enable_claims_revamp":true,"delhivery_supplier_code":"default","enable_sale_event":false,"ads_smart_campaign_modal_last_cancel_date":"2024,07,12","enable_product_recommendations":false,"enable_bulk_inventory_update":true,"enable_inventory_needs_attention":false,"enable_reward_incentive":true,"ads_smart_campaign_upsell_banner_submit_date":"2022,1,20","enable_support_label_download":false,"compliance_gating_supplier_enabled_v1":true,"enable_support_claims_blocking_on_suborder":false,"enable_promotions_v1":true,"enable_supplier_support_v3":true,"enable_supplier_support":true,"enable_meesho_recommendation_vtax":true,"enable_supplier_program_review":true,"enable_notices_mweb_v3":true,"supplier_wdrp_difference":false,"npp_variation_type":4,"enable_support_claims_evidence_ds":false,"enable_ni_supplier_removal_feature":true,"ads_smart_campaign_upsell_banner_last_cancel_date":"2022,1,20","is_v3_settings_active":true,"enable_combining_label_and_manifest_download_flow":true,"ads_new_catalog_tester_insights_pop_up_shown":false,"enable_no_pack_banner":false,"loc_preapproved_amount":500000,"enable_support_chatbot":true,"pricing_competitive_marketplace_metrics":0,"enable_support_h2_experiment":false,"enable_referral_desktop_v3":true,"enable_product_recommendations_mweb_v3":false,"enable_notices_v3":true,"enable_mweb_catalog_simplification":true,"disable_returns":false,"enable_ads_v3":true,"enable_webinar":false,"remove_high_price_tab":true,"ads_has_auto_played_vg_video":false,"enable_returns_v3":true,"compliance_attribute_upload_limit":5,"bp_scan_relink":true,"enable_shipped_v2":true,"enable_growth_insights_v1":false,"enable_supplier_ads":true,"show_bank_success_banner":false,"enable_ready_to_ship_v2":true,"homogenized_supplier_experiment_cohort_flag":false,"enable_async_label_download":true,"enable_referral":true,"mall_commission_rate":0,"enable_smart_price":true,"oos_reason_collection":false,"enable_settings_v3":true,"whatsapp_number":"8945808358","viewed_campaign_details_onboarding":true,"enable_share_referral_banner_on_app":true,"enable_catalog_management":true,"ads_performance_page_banner_last_cancel_date":"2024,04,02","compliance_gating_supplier_repeat_offender":false,"enable_support_cmb":false,"enable_price_recommendation_v2":true,"ads_new_catalog_booster_manual_creation_visited":1,"smart_pricing_mweb_variant":1,"enable_support_price_change_excel_upload":true,"is_supplier_ums_first_login":false,"enable_size_chart":false,"whatsapp_opt_in_v2":false,"socket_messages_config":"{\"scale\":1,\"retry\":false,\"minRetryDelay\":40000,\"maxRetryDelay\":120000}","npp_variation_type_bulkCatalog":3,"is_supplier_enabled_for_pc":false,"scalable_supplier":false,"enable_claims_v3":false,"ads_new_catalog_booster_manual_creation_last_visited_date":"2025,06,14","enable_meri_shop_widget":true,"enable_catalog_category_simplification":true,"enable_supplier_support_inbound_call":false,"enabled_bank_details_edit_self_serve":true,"enable_latch_on_mweb":true,"enable_old_catalog_upload":false,"enable_price_reco_bulk":true,"npp_v2_bulk_catalog_upload_variant":1,"is_deferred_supplier":false,"is_supplier_enabled_for_sos":true,"enable_bp_scan_desktop":true,"is_consolidation_enabled_for_supplier":true,"enable_support_claims_multiple":false,"enable_3pl_preference":true,"bp_buy_cta":true,"enable_only_wrong_return":true,"enable_supplier_referral_invite":true,"ads_smart_campaign_manual_creation_last_visited_date":"2024,07,08","disable_catalog_upload":false,"enable_listing_go_live":true,"enable_bulk_catalog_upload":true,"enable_single_catalog_upload":true,"bulk_compliance_attribute_update_v2":true,"one_direct_am":"catalog_inflow_77@meesho.com","clickwrap_signing_name":"Anish Mittal","xpressbees_supplier_code":"RTO-E/S-501/3","oms-client":"eVanik","enable_catalog_visibility":true,"enable_add_recommended_category":true,"enable_wdrp_guardrail":false,"enable_catalog_product_crud_with_taxonomy":true,"seller_code":"R0","clickwrap_mobile_number":"+918945808358","disable_supplier_sales_metrics":false,"bp_scan_state":true,"referral_fraud_nonincremental_feature":true,"enable_bulk_images_upload":true,"enable_whatsapp_subscription":true,"enable_activation_v3":true,"enable_on_hold_v2":false,"enable_quality_dashboard_v2":true,"enable_price_control_mweb":true,"enable_quality_dashboard_v4":false,"dtdc_supplier_code":"default","enable_price_control":true,"enable_quality_dashboard_v3":true,"support_restrict_tickets_via_others":false,"is_sunday_working":true,"enable_single_image_upload_v2_exp":0,"non_gst_migration":false,"ecom_supplier_code":"WB/SGH/SGX","enable_ads_daily_budget_guide":true,"show_ads_on_inventory_popup":false,"enable_cross_sell_recos":1,"enable_return_overview":true,"enable_support_transparent_packaging":false,"disable_cod":false,"label_template_version":"template_v2","is_exchange_available":true,"one_direct_enable":true,"ads_smart_campaign_modal_last_view_date":"2022,1,20","force_payment_block":false,"show_desc_as_textbox":true,"enable_dynamic_sscat_image_guidelines":true,"ads_cpc_bidding_popup_count":0,"elasticrun_supplier_code":"default","enable_payments_v3":true,"enable_hold":true,"enable_promotions_flash":true,"enable_product_recommendations_v2":true,"enable_product_recommendations_v3":false,"enable_price_recommendation":false,"shadowfox_supplier_code":"default","enable_status_visibility_in_bulk_inventory_update":false,"enable_qc_visibility":true,"enable_supplier_leave_form":true,"is_created_by_supplier_ums":true,"supplier_check_referral_abuse":true,"enable_cancelled_v2":true,"enable_smart_sourcing":false,"enable_webinar_v2":true,"enable_pending_v2":true,"first_mile_nodes":"FJD","enable_promotions":true,"enable_supplier_incentive_v2":false,"npp_variation_type_mweb":3,"enable_support_multiple_claims":true,"enable_product_recommendations_top_selling":true,"wow_supplier_code":"default","included_ads_widget_list":"INCREMENT_BUDGET","enable_marketplace":false,"enable_finance_tab":true,"hide_customer_contact":true,"enable_mweb_catalog_upload":true,"last_interacted_tos_banner":"2022,01,20","enable_return_rto_orders_v2":false,"enable_orders_v3":true,"clickwrap_business_registered_name":"Mittal distributors","enable_home_v3":true,"enable_promotions_smartcoin":true,"enable_async_gst_download":true,"enable_business_dashboard_v2":true,"enable_business_dashboard_v1":true,"enable_meecom_web_popup":true,"max_quantity":1,"show_ad_credits_tooltip":false,"agentless_support_enabled":true,"enable_npp_high_asp":true,"test_attribute":true,"enable_support_tickets_revamp":true,"enable_aggregator_merging":true,"enable_support_one_click_ssat":false,"ads_smart_campaign_manual_creation_visited":7,"supplier_ignore_optin_ids":"323","fastrack_enabled":false,"enable_waas_supplier":false,"cross_sell_reco_variant":0,"smart_pricing_variant":1,"portfolio":"Others","enable_origin_country_input":true,"incentive_v2_supplier_id_threshold":846923,"stepper_journey_status":"StepperStepComplete","clickwrap_gstin":"19FBCPM3985A1ZJ","enable_high_asp_flag":4,"fareye_supplier_code":"default","enable_ipp":true,"is_first_login":false,"enable_ipp_image_recommendations":true,"enable_support_order_confirmation_and_cancellation":false,"ads_performance_page_popup_last_view_date":"2024,06,22","enable_catalog_category_search":true,"enable_catalog_upload_v3":true,"ads_widget_details_on_HP":"{\"widget_type\":\"DEFAULT\",\"view_date\":\"2025,10,16\",\"no_of_days\":99}","enable_variation_level_pricing":true,"enable_inventory_v3":true,"enable_meesho_recommendation":true,"enable_inventory_v2":false,"show_referral_banner":false,"wdrp_min_guardrail_percentage":50,"enable_async_pending_orders":true,"fedex_supplier_code":"default","clickwrap_gstin_address":"Siliguri","last_interacted_ads_widget":"2024,07,07","enable_product_optimiser":true,"is_return_available":true,"enable_live_video":false,"business_type":"I am a manufacturer","enable_supplier_authorised_brand_seller":false,"enable_mweb_upload_desktop":true,"enable_barcoded_packaging_dashboard":true,"price_recommendation_v3_mobile":true,"rpc":false,"skip_cis_qc":true,"enable_rts_sort_filter":true,"enable_completed_tab":false,"enable_catalog_edit":true,"enable_catalog_edit_mweb":false,"enable_supplier_signature_v2":false,"price_control_tool_tip":false,"qrcode_on_s2r_invoice":false,"enable_promotions_deal":true,"orders_enable_scan_and_pack":false,"waas_b2b_pickup_address":"{}","handle":"MittalDistributor","gst_type":"GSTIN","valid":true,"return_ui_enable":true,"quality_dashboard_enable":true,"trusted":false,"kyc_details":{"gst_type":"GSTIN","gstin":"19FBCPM3985A1ZJ","account_number":"41772623001","account_holder_name":"MITTAL DISTRIBUTORS","bank_name":"STATE BANK OF INDIA","ifsc_code":"SBIN0007245","bank_details_status":"approved","gstin_otp_verification_status":true}},"user":{"id":"512aecfa-676c-4984-a2ed-d1c5bfc2a45d","name":"Mittal Distributor","email":"mittalanish8055@gmail.com","mobile_number":"8945808358","uid":"512aecfa-676c-4984-a2ed-d1c5bfc2a45d","role":"user","created":"2021-04-24T11:47:36","valid":1,"language":{"id":1,"name":"English","iso_language_code":"EN"},"country":{"id":1,"name":"India","iso_country_code":"IN"},"requestHeadersForDownstream":{},"feature_permissions":{},"suppliers":[{"supplier_id":113207,"identifier":"yoxpf","name":"Mittal Distributor"}],"is_password_set":true},"supplier_warehouse_mapping":[]};</script></html>

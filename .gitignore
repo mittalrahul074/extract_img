@@ -1,0 +1,14 @@
+#ignore all excel files
+*.xlsx
+*.xls
+*.xlsm
+*.xlsb
+*.xltx
+*.xltm
+*.xlt
+*.csv
+*.tsv
+#ignore folder scanned
+scanned/
+#ignore firebase credentials
+firebase_credentials.json
