@@ -64,6 +64,14 @@ def extract_from_row(r):
         pass
     return {"img_url": img_url, "sku": sku}
 
+def scroll_down(driver, container):
+    driver.execute_script("arguments[0].scrollTop += arguments[0].clientHeight - 50;", container)
+    driver.execute_script("""
+    const container = document.querySelector('.MuiTableContainer-root');
+    container.scrollBy(0, 600);
+    """)
+    time.sleep(PAUSE)
+
 def scrape_table(driver):
     wait = WebDriverWait(driver, 15)
     results = []
@@ -86,9 +94,14 @@ def scrape_table(driver):
         btn = wait.until(EC.presence_of_element_located(
             (By.XPATH, "//button[contains(@class, 'Mui-selected') and contains(@class, 'css-1x0xy1y')]")
         ))
-        match = re.search(r'\d+', btn.text.strip())
+
+        text = btn.get_attribute("innerText").strip()
+        #debug
+        # print("Button text:", text)
+        match = re.search(r'\d+',text)
         expected_count = int(match.group()) if match else None
-    except Exception:
+    except Exception as e:
+        print("ERROR:", e)
         expected_count = None
 
     print(f"[*] Expected total rows: {expected_count or 'unknown'}")
@@ -99,30 +112,29 @@ def scrape_table(driver):
             rows = driver.execute_script(
                 """ const rows = Array.from(document.querySelectorAll("tr.MuiTableRow-root.MuiTableRow-hover"));
                     return rows.map(r => ({
+                    suborder_id: r.querySelector('td:nth-child(3)') ? r.querySelector('td:nth-child(3)').innerText.trim() : null,
                     tabindex: r.getAttribute("tabindex"),
                     img : r.querySelector('img') ? (r.querySelector('img').getAttribute('src') || r.querySelector('img').getAttribute('data-src')) : null,
                     sku : (() => { const skuEl = r.querySelector('td:nth-child(4) div div p'); return skuEl ? skuEl.innerText.trim() : null; })()
                     })); """)
-        except Exception:
-            print("[-] Failed to find rows; retrying...")
+            # print(f"[DEBUG] Found {len(rows)} rows on page")
+        except Exception as e:
+            print(f"[-] Failed to find rows; retrying... Error: {e}")
             time.sleep(1)
             continue
 
         new_rows = 0
 
         for row in rows:
-            tab_index = row["tabindex"]
+            tab_index = row["suborder_id"]
             if not tab_index or tab_index in seen_indexes:
                 continue
 
             seen_indexes.add(tab_index)
-            # item = extract_from_row(row)
-            # if not item:
-            #     continue
-
-            # results.append(item)
             all_data.append(row)
             new_rows += 1
+            last_tabindex = tab_index
+            # print(f"[DEBUG] Added row with tabindex={tab_index}, sku={row.get('sku')}, img={row.get('img')}")
 
         if new_rows:
             empty_scrolls = 0
@@ -152,6 +164,10 @@ def scrape_table(driver):
                 driver.execute_script("arguments[0].scrollTop -= 100;", container)
                 time.sleep(0.3)
                 driver.execute_script("arguments[0].scrollTop += arguments[0].clientHeight;", container)
+                driver.execute_script("""
+                const container = document.querySelector('.MuiTableContainer-root');
+                container.scrollBy(0, 600);
+                """)
             else:
                 driver.execute_script("window.scrollBy(0, -100);")
                 time.sleep(0.3)
@@ -159,22 +175,109 @@ def scrape_table(driver):
             same_last_seen = 0
             empty_scrolls += 1
             continue
-        
-        try:
-            using_outer_scroll = False
-            if not using_outer_scroll and is_scrollable:
-                driver.execute_script(
-                    "arguments[0].scrollTop += arguments[0].clientHeight - 50;", container
-                )
-            else:
-                driver.execute_script("window.scrollBy(0, window.innerHeight - 50);")
-                driver.execute_script(
-                    "arguments[0].scrollTop += arguments[0].clientHeight - 50;", container
-                )
-        except Exception:
+
+        # try:
+        #     using_outer_scroll = False
+        #     if not using_outer_scroll and is_scrollable:
+        #         print("[DEBUG] Scrolling container (scrollable detected)")
+        #         try:
+        #             try:
+        #                 print("[DEBUG] Attempting container scroll")
+        #                 driver.execute_script("arguments[0].scrollTop += arguments[0].clientHeight - 50;", container)
+        #             except Exception as e:
+        #                 driver.execute_script("""
+        #                 const container = document.querySelector('.MuiTableContainer-root');
+        #                 container.scrollBy(0, 600);
+        #                 """)
+        #                 print(f"[!] Container scroll failed; trying alternative scroll method. Error: {e}")
+        #         except Exception as e:
+        #             print(f"[!] Container scroll failed; trying outer scroll instead. Error: {e}")
+        #             driver.execute_script("window.scrollBy(0, window.innerHeight - 50);")
+        #     else:
+        #         print("[DEBUG] Scrolling window (fallback to outer scroll)")
+        #         try:
+        #             print("[DEBUG] Attempting outer scroll (window.scrollBy)")
+        #             driver.execute_script("window.scrollBy(0, window.innerHeight - 50);")
+        #         except Exception as e:
+        #             print(f"[!] window.scrollBy failed: {e}")
+                
+        #         try:
+        #             print("[DEBUG] Attempting container scrollTop adjustment")
+        #             driver.execute_script(
+        #                 "arguments[0].scrollTop += arguments[0].clientHeight - 50;", container
+        #             )
+        #         except Exception as e:
+        #             print(f"[!] container scrollTop failed: {e}")
+                
+        #         try:
+        #             print("[DEBUG] Attempting container.scrollBy method")
+        #             driver.execute_script("""
+        #             const container = document.querySelector('.MuiTableContainer-root');
+        #             if (container) {
+        #                 container.scrollBy(0, 600);
+        #             } else {
+        #                 console.warn('Container not found');
+        #             }
+        #             """)
+        #         except Exception as e:
+        #             print(f"[!] container.scrollBy failed: {e}")
+        # except Exception:
             print("[!] Scroll attempt failed; trying outer scroll instead.")
             driver.execute_script("window.scrollBy(0, window.innerHeight - 50);")
             using_outer_scroll = True
+
+        # --- PROFESSIONAL SCROLL LOGIC ---
+
+        try:
+            scroll_result = driver.execute_script("""
+            function getScrollableParent(el) {
+                while (el) {
+                    const style = window.getComputedStyle(el);
+                    const overflowY = style.overflowY;
+                    if ((overflowY === 'auto' || overflowY === 'scroll') &&
+                        el.scrollHeight > el.clientHeight) {
+                        return el;
+                    }
+                    el = el.parentElement;
+                }
+                return document.scrollingElement;
+            }
+
+            const row = document.querySelector('tr.MuiTableRow-root');
+            const scrollParent = getScrollableParent(row);
+
+            if (!scrollParent) return { status: "no_scroll_parent" };
+
+            const before = scrollParent.scrollTop;
+            scrollParent.scrollBy(0, 900);
+            const after = scrollParent.scrollTop;
+
+            return {
+                status: "scrolled",
+                before: before,
+                after: after,
+                atBottom: (scrollParent.scrollTop + scrollParent.clientHeight >= scrollParent.scrollHeight - 5)
+            };
+            """)
+
+            print(f"[DEBUG] Scroll status: {scroll_result}")
+            time.sleep(5)
+
+            if scroll_result.get("before") == scroll_result.get("after"):
+                print("[!] Scroll position did not change → likely reached bottom.")
+                #try outer scroll to confirm
+                driver.execute_script("window.scrollBy(0, window.innerHeight - 150);")
+                empty_scrolls += 1
+
+            if scroll_result.get("atBottom"):
+                print("[✓] Reached bottom of scroll container.")
+                empty_scrolls += 1
+
+        except Exception as e:
+            print(f"[CRITICAL] Scroll JS execution failed: {e}")
+            empty_scrolls += 1
+
+        time.sleep(0.8)
 
         time.sleep(PAUSE)
 
