@@ -23,11 +23,12 @@ import undetected_chromedriver as uc
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, ElementClickInterceptedException
+import traceback
 
 PROFILE_DIR = r"C:\Projects\ecommerce-listing-automation\meesho_profile"
 URL = "https://supplier.meesho.com/panel/v3/new/fulfillment/yoxpf/orders/ready-to-ship"
 URL2 = "https://supplier.meesho.com/panel/v3/new/fulfillment/yoxpf/orders/pending"
-TABLE_CONTAINER_XPATH = "//div[contains(@class, 'MuiTableContainer-root')]"
+TABLE_CONTAINER_XPATH = "//table"
 TABLE_ROW_XPATH = ".//tr[contains(@class, 'MuiTableRow-root') and contains(@class, 'MuiTableRow-hover')]"
 
 MAX_EMPTY = 6
@@ -36,10 +37,10 @@ PAUSE = 0.2
 def start_driver():
     opts = uc.ChromeOptions()
     opts.add_argument(f"--user-data-dir={PROFILE_DIR}")
-    opts.add_argument("--window-size=1400,1000")
-    opts.add_argument("--start-maximized")
-    opts.add_argument("--force-device-scale-factor=0.9")
-    return uc.Chrome(version_main=144, service=ChromeService(ChromeDriverManager().install()), options=opts)
+    # opts.add_argument("--window-size=1400,1000")
+    # opts.add_argument("--start-maximized")
+    # opts.add_argument("--force-device-scale-factor=0.9")
+    return uc.Chrome(version_main=147, service=ChromeService(ChromeDriverManager().install()), options=opts)
 
 def extract_from_row(r):
     img_url = None
@@ -91,10 +92,17 @@ def scrape_table(driver):
 
     # detect total expected rows from selected pagination button (if available)
     try:
+        # <div class="_13ecjqie" style="top: 60px; z-index: 10;"><div class="_13ecjqi0 _13ecjqi4 _13ecjqi2d _13ecjqi3 _18xd4ik2"><div role="tablist" class="m_177_1yafh2y0 m_177_1yafh2y2 _18xd4ik3" aria-orientation="horizontal" tabindex="-1"><button class="m_177_1yafh2y1 m_177_1yafh2y6 _18xd4ik5 _18xd4ik4" id="tab-0" type="button" role="tab" aria-selected="false" aria-controls="tabpanel-0" data-active="false">On Hold</button><button class="m_177_1yafh2y1 m_177_1yafh2y6 _18xd4ik5 _18xd4ik4" id="tab-1" type="button" role="tab" aria-selected="false" aria-controls="tabpanel-1" data-active="false">Pending (41)</button><button class="m_177_1yafh2y1 m_177_1yafh2y6 _18xd4ik5 _18xd4ik4" id="tab-2" type="button" role="tab" aria-selected="true" aria-controls="tabpanel-2" data-active="true">Ready to Ship (214)</button><button class="m_177_1yafh2y1 m_177_1yafh2y6 _18xd4ik5 _18xd4ik4" id="tab-3" type="button" role="tab" aria-selected="false" aria-controls="tabpanel-3" data-active="false">Shipped</button><button class="m_177_1yafh2y1 m_177_1yafh2y6 _18xd4ik5 _18xd4ik4" id="tab-4" type="button" role="tab" aria-selected="false" aria-controls="tabpanel-4" data-active="false">Cancelled</button></div></div></div>
+        # get the btn with text containing "Ready to Ship (214)" or "Pending (41)" depending on the page with using class
+        print("[*] Detecting expected total count from pagination buttons...")
+        if "pending" in driver.current_url:
+            btn_text = "Pending"
+        elif "ready-to-ship" in driver.current_url:
+            btn_text = "Ready to Ship"
         btn = wait.until(EC.presence_of_element_located(
-            (By.XPATH, "//button[contains(@class, 'Mui-selected') and contains(@class, 'css-1x0xy1y')]")
+            (By.XPATH, f"//button[contains(normalize-space(), '{btn_text}')]")
         ))
-
+        print(f"[*] Found pagination button: '{btn.text.strip()}'")
         text = btn.get_attribute("innerText").strip()
         #debug
         # print("Button text:", text)
@@ -102,22 +110,45 @@ def scrape_table(driver):
         expected_count = int(match.group()) if match else None
     except Exception as e:
         print("ERROR:", e)
+        print("[-] Failed to detect expected count from pagination button; proceeding without it.")
         expected_count = None
 
     print(f"[*] Expected total rows: {expected_count or 'unknown'}")
+    last_tabindex = None
 
     while empty_scrolls < MAX_EMPTY:
         try:
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "tbody tr"))
+            )
             # rows = container.find_elements(By.XPATH, TABLE_ROW_XPATH)
-            rows = driver.execute_script(
-                """ const rows = Array.from(document.querySelectorAll("tr.MuiTableRow-root.MuiTableRow-hover"));
-                    return rows.map(r => ({
-                    suborder_id: r.querySelector('td:nth-child(3)') ? r.querySelector('td:nth-child(3)').innerText.trim() : null,
-                    tabindex: r.getAttribute("tabindex"),
-                    img : r.querySelector('img') ? (r.querySelector('img').getAttribute('src') || r.querySelector('img').getAttribute('data-src')) : null,
-                    sku : (() => { const skuEl = r.querySelector('td:nth-child(4) div div p'); return skuEl ? skuEl.innerText.trim() : null; })()
-                    })); """)
-            # print(f"[DEBUG] Found {len(rows)} rows on page")
+            rows = driver.execute_script("""
+                const tbody = document.querySelector("tbody");
+                if (!tbody) return [];
+
+                const rows = Array.from(tbody.querySelectorAll("tr"));
+
+                return rows.map(function(r) {
+                    const tds = r.querySelectorAll("td");
+
+                    if (tds.length != 9) return null;
+
+                    const suborder = tds[2] ? tds[2].innerText.trim() : null;
+
+                    if (!suborder) return null;
+
+                    return {
+                        suborder_id: suborder,
+                        tabindex: r.getAttribute("tabindex"),
+                        img: r.querySelector('img') ? (r.querySelector('img').getAttribute('src') || r.querySelector('img').getAttribute('data-src')) : null,
+                        sku: (function() {
+                            const skuEl = r.querySelector('td:nth-child(4) div div p');
+                            return skuEl ? skuEl.innerText.trim() : null;
+                        })()
+                    };
+                }).filter(function(r) { return r !== null; });
+                """)
+            print(f"[DEBUG] Found {len(rows)} rows on page")
         except Exception as e:
             print(f"[-] Failed to find rows; retrying... Error: {e}")
             time.sleep(1)
@@ -126,15 +157,15 @@ def scrape_table(driver):
         new_rows = 0
 
         for row in rows:
-            tab_index = row["suborder_id"]
-            if not tab_index or tab_index in seen_indexes:
+            sub_order_id = row["suborder_id"]
+            if not sub_order_id or sub_order_id in seen_indexes:
                 continue
 
-            seen_indexes.add(tab_index)
+            seen_indexes.add(sub_order_id)
             all_data.append(row)
             new_rows += 1
-            last_tabindex = tab_index
-            # print(f"[DEBUG] Added row with tabindex={tab_index}, sku={row.get('sku')}, img={row.get('img')}")
+            current_last = sub_order_id
+            # print(f"[DEBUG] Added row with tabindex={sub_order_id}, sku={row.get('sku')}, img={row.get('img')}")
 
         if new_rows:
             empty_scrolls = 0
@@ -149,13 +180,15 @@ def scrape_table(driver):
 
         # check for repeated last row
         try:
-            current_last = rows[-1].get_attribute("tabindex")
             if current_last == last_tabindex:
                 same_last_seen += 1
+                print(f"[DEBUG] Last row sub_order_id {current_last} seen again ({same_last_seen}/{MAX_EMPTY})")
             else:
                 same_last_seen = 0
                 last_tabindex = current_last
-        except Exception:
+                print(f"[DEBUG] New last row sub_order_id: {current_last}")
+        except Exception as e:
+            print(f"[!] Error checking last row sub_order_id: {e}")
             pass
 
         if same_last_seen >= 4:
@@ -229,6 +262,7 @@ def scrape_table(driver):
         # --- PROFESSIONAL SCROLL LOGIC ---
 
         try:
+            print("[DEBUG] Executing professional scroll JS")
             scroll_result = driver.execute_script("""
             function getScrollableParent(el) {
                 while (el) {
@@ -243,20 +277,29 @@ def scrape_table(driver):
                 return document.scrollingElement;
             }
 
-            const row = document.querySelector('tr.MuiTableRow-root');
+            const row = document.querySelector('tr');
             const scrollParent = getScrollableParent(row);
 
-            if (!scrollParent) return { status: "no_scroll_parent" };
+            if (!scrollParent) return {
+                status: "no_scroll_parent",
+                rowFound: !!row,
+                rowNode: row ? row.nodeName : null
+            };
 
             const before = scrollParent.scrollTop;
             scrollParent.scrollBy(0, 900);
             const after = scrollParent.scrollTop;
+            const scrollParentStyle = window.getComputedStyle(scrollParent);
 
             return {
                 status: "scrolled",
                 before: before,
                 after: after,
-                atBottom: (scrollParent.scrollTop + scrollParent.clientHeight >= scrollParent.scrollHeight - 5)
+                atBottom: (scrollParent.scrollTop + scrollParent.clientHeight >= scrollParent.scrollHeight - 5),
+                rowFound: !!row,
+                rowNode: row ? row.nodeName : null,
+                scrollParentNode: scrollParent ? scrollParent.nodeName : null,
+                scrollParentOverflow: scrollParentStyle.overflowY
             };
             """)
 
