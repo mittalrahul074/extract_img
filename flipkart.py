@@ -1,4 +1,5 @@
 import pandas as pd
+from openpyxl.utils import get_column_letter
 
 # Path to your XLS file
 path = "flipkart.xls"
@@ -115,9 +116,34 @@ def save_df_to_firebase2(df):
 # get the useful columns from the user dynamically
 
 use_col = "G,"
-user_input = input("Enter additional columns to include (e.g., 'S' for image URLs)").strip()
-if user_input:
-    use_col += user_input
+# user_input = input("Enter additional columns to include (e.g., 'S' for image URLs)").strip()
+# if user_input:
+#     use_col += user_input
+
+header_df = pd.read_excel(
+    path,
+    sheet_name=2,
+    nrows=0
+)
+
+# Find the column containing "Main Image URL"
+img_col = None
+img_col_letter = None
+
+for idx, col in enumerate(header_df.columns, start=1):
+    col_clean = str(col).strip().lower()
+
+    if "main image url" in col_clean:
+        img_col = col
+        img_col_letter = get_column_letter(idx)
+        break
+
+if img_col is None:
+    raise Exception("Could not find 'Main Image URL' column")
+
+use_col += img_col_letter or ""
+
+print(f"Using columns: {use_col}")
 
 df = pd.read_excel(
     path,
